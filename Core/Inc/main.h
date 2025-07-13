@@ -51,11 +51,16 @@ extern "C" {
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
+/* Exported variables --------------------------------------------------------*/
+extern TIM_HandleTypeDef htim2;
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+#include "PWM.h"
+#include "Key.h"
+#include "Box_action.h"
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
