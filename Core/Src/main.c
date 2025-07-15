@@ -49,6 +49,9 @@ TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN PV */
 _Bool statu;
 uint8_t KeyNum;
+
+// 测试模式变量 - 设置为1开启测试模式，舵机将从0到180度循环往复
+#define TEST_MODE 0  // 改为1开启测试模式
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,13 +104,20 @@ int main(void)
   Key_Init();
   PWM_Init();
   
-  // 初始化动作序列
+#if TEST_MODE
+  // 测试模式：舵机从0到180度循环往复，每次30度，每次3秒
+  // 初始化舵机到0度位置
+  Servo_SetAngle1(0.0f);
+  Servo_SetAngle2(0.0f);
+#else
+  // 正常模式：执行原有的初始化动作序列
   Action_Type(500, FOLD, 150);
   Action_Type(0, CLOSE, 80);
   Action_Slow(Long_time, F_LID, LID_CLOSE_VALUE, LID_OPEN_VALUE, 2, 40, 1600); // 窥视
   Action_Slow(0, F_LID, LID_OPEN_VALUE, LID_CLOSE_VALUE, 2, 50, 500);
   HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
   HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,12 +127,38 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+#if TEST_MODE
+    // 测试模式：舵机从0到180度循环往复，每次30度，每次3秒
+    static float currentAngle = 0.0f;
+    static int8_t direction = 1;  // 1表示递增，-1表示递减
+    
+    // 设置舵机角度
+    Servo_SetAngle1(currentAngle);
+    Servo_SetAngle2(currentAngle);
+    
+    // 延时3秒
+    HAL_Delay(3000);
+    
+    // 计算下一个角度
+    currentAngle += direction * 30.0f;
+    
+    // 检查边界并改变方向
+    if (currentAngle >= 180.0f) {
+        currentAngle = 180.0f;
+        direction = -1;  // 开始递减
+    } else if (currentAngle <= 0.0f) {
+        currentAngle = 0.0f;
+        direction = 1;   // 开始递增
+    }
+#else
+    // 正常模式：执行按键检测和动作
     uint8_t KeyNum = Key();
     mode = rand() % mode_num;
     if (KeyNum)
     {
       Box_action();
     }
+#endif
     /* USER CODE END 3 */
   }
 }
