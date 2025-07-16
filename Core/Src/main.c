@@ -153,7 +153,7 @@ int main(void)
 #else
     // 正常模式：执行按键检测和动作
     uint8_t KeyNum = Key();
-    mode = rand() % mode_num;
+    mode = rand() % (RANDOM_MODE_RANGE + 1);  // 0~RANDOM_MODE_RANGE范围内随机
     if (KeyNum)
     {
       Box_action();

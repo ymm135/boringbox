@@ -49,6 +49,9 @@ extern "C" {
 #define Short_time           800
 #define Long_time            3000
 
+/* 随机模式范围宏定义 */
+#define RANDOM_MODE_RANGE    10  // 随机模式范围：0~10
+
 /* 全局变量声明 */
 extern uint8_t Cnt;
 extern uint8_t mode;
