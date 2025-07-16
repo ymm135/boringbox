@@ -26,14 +26,14 @@ extern "C" {
 #define F_PUSH               1
 
 /* 动作类型宏 */
-#define OPEN                 0
-#define CLOSE                1
-#define PUSH                 2
-#define FOLD                 3
-#define NO_CLOSE             4
-#define NO_PUSH              5
-#define NO_OPEN              6
-#define NIL                  8
+#define TYPE_LID_OPEN                 0
+#define TYPE_LID_CLOSE                1
+#define TYPE_PUSH_OPEN                2
+#define TYPE_PUSH_CLOSE               3
+#define TYPE_LID_NO_CLOSE             4
+#define TYPE_PUSH_NO_OPEN             5
+#define TYPE_LID_NO_OPEN              6
+#define NIL                           8
 
 /* 动作宏定义 */
 #define LID_OPEN             Servo_SetAngle2(LID_OPEN_VALUE)

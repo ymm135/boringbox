@@ -111,10 +111,10 @@ int main(void)
   Servo_SetAngle2(0.0f);
 #else
   // 正常模式：执行原有的初始化动作序列
-  Action_Type(500, FOLD, 150);
-  Action_Type(0, CLOSE, 80);
-  Action_Slow(Long_time, F_LID, LID_CLOSE_VALUE, LID_OPEN_VALUE, 2, 40, 1600); // 窥视
-  Action_Slow(0, F_LID, LID_OPEN_VALUE, LID_CLOSE_VALUE, 2, 50, 500);
+  Action_Type(500, TYPE_PUSH_CLOSE, 150);
+  Action_Type(0, TYPE_LID_CLOSE, 80);
+  // Action_Slow(Long_time, F_LID, LID_CLOSE_VALUE, LID_OPEN_VALUE, 2, 40, 1600); // 窥视
+  // Action_Slow(0, F_LID, LID_OPEN_VALUE, LID_CLOSE_VALUE, 2, 50, 500);
   HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
   HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
 #endif
