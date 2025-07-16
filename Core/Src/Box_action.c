@@ -13,6 +13,10 @@ uint8_t random_time;
 _Bool Action;
 const uint8_t mode_num = 24;
 
+/* 待机模式相关变量 */
+uint32_t last_activity_time = 0;  // 最后活动时间
+uint8_t system_state = SYSTEM_ACTIVE;  // 系统状态，默认为活跃状态
+
 /**
  * @brief 延时函数
  * @param ms 延时毫秒数
@@ -232,4 +236,96 @@ void Box_action(void)
     Delay_ms(300);
     HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
     HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+}
+
+/**
+ * @brief 更新活动时间
+ * @param None
+ * @retval None
+ */
+void Update_Activity_Time(void)
+{
+    last_activity_time = HAL_GetTick();
+}
+
+/**
+ * @brief 检查待机超时
+ * @param None
+ * @retval None
+ */
+void Check_Standby_Timeout(void)
+{
+    if(system_state == SYSTEM_ACTIVE)
+    {
+        uint32_t current_time = HAL_GetTick();
+        if((current_time - last_activity_time) >= STANDBY_TIMEOUT)
+        {
+            Enter_Standby_Mode();
+        }
+    }
+}
+
+/**
+ * @brief 进入待机模式
+ * @param None
+ * @retval None
+ */
+void Enter_Standby_Mode(void)
+{
+    system_state = SYSTEM_STANDBY;
+    
+    // 停止PWM输出
+    HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_2);
+    
+    // 配置PA2为外部中断唤醒源
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;  // 下降沿触发
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    
+    // 使能EXTI2中断
+    HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+    
+    // 进入停止模式
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+}
+
+/**
+ * @brief 退出待机模式
+ * @param None
+ * @retval None
+ */
+void Exit_Standby_Mode(void)
+{
+    // 重新配置系统时钟
+    SystemClock_Config();
+    
+    // 重新配置PA2为普通输入模式
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    
+    // 禁用EXTI2中断
+    HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+    
+    system_state = SYSTEM_ACTIVE;
+    Update_Activity_Time();
+}
+
+/**
+ * @brief GPIO外部中断回调函数
+ * @param GPIO_Pin: 触发中断的GPIO引脚
+ * @retval None
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == GPIO_PIN_2 && system_state == SYSTEM_STANDBY)
+    {
+        Exit_Standby_Mode();
+    }
 }

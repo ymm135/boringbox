@@ -104,6 +104,9 @@ int main(void)
   Key_Init();
   PWM_Init();
   
+  // 初始化待机模式
+  Update_Activity_Time();
+  
 #if TEST_MODE
   // 测试模式：舵机从0到180度循环往复，每次30度，每次3秒
   // 初始化舵机到0度位置
@@ -152,10 +155,13 @@ int main(void)
     }
 #else
     // 正常模式：执行按键检测和动作
+    Check_Standby_Timeout();  // 检查是否需要进入待机模式
+    
     uint8_t KeyNum = Key();
     mode = rand() % (RANDOM_MODE_RANGE + 1);  // 0~RANDOM_MODE_RANGE范围内随机
     if (KeyNum)
     {
+      Update_Activity_Time();  // 更新活动时间
       Box_action();
     }
 #endif

@@ -56,6 +56,7 @@ extern TIM_HandleTypeDef htim2;
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void SystemClock_Config(void);
 
 /* USER CODE BEGIN EFP */
 #include "PWM.h"
