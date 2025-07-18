@@ -52,29 +52,18 @@ extern "C" {
 /* 随机模式范围宏定义 */
 #define RANDOM_MODE_RANGE    10  // 随机模式范围：0~10
 
-/* 待机模式宏定义 */
-#define STANDBY_TIMEOUT      120000  // 待机超时时间：120秒 (单位：ms)
-#define SYSTEM_ACTIVE        0      // 系统活跃状态
-#define SYSTEM_STANDBY       1      // 系统待机状态
-
 /* 全局变量声明 */
 extern uint8_t Cnt;
 extern uint8_t mode;
 extern const uint8_t mode_num;
 extern uint8_t random_time;
 extern _Bool Action;
-extern uint32_t last_activity_time;  // 最后活动时间
-extern uint8_t system_state;         // 系统状态
 
 /* 函数声明 */
 void Action_Type(uint32_t windup, uint8_t action, uint32_t recovery);
 void Action_Slow(uint32_t windup, _Bool part, uint8_t begin, uint8_t final, uint8_t change, uint32_t time, uint32_t recovery);
 void Box_action(void);
 void Delay_ms(uint32_t ms);
-void Enter_Standby_Mode(void);       // 进入待机模式
-void Exit_Standby_Mode(void);        // 退出待机模式
-void Check_Standby_Timeout(void);    // 检查待机超时
-void Update_Activity_Time(void);     // 更新活动时间
 
 #ifdef __cplusplus
 }
